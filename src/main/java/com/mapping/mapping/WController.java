@@ -8,7 +8,7 @@ public class WController {
 
 	@RequestMapping("/")
 	public String index() {
-		return "Greetings from Spring Boot!";
+		return "Welcome Mapping";
 	}
 
 }
