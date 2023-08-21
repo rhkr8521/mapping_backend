@@ -6,9 +6,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.io.IOException;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -22,7 +26,7 @@ public class memoController {
 		this.boardRep = boardRep;
 	}
 	
-    // 메모 생성: {url}/memo/create?content={content}&writer={writer}&lat={lat}&log={log}&img={img}&date={date}&tag={tag}
+    // URL GET 메모 생성: {url}/memo/create?content={content}&writer={writer}&lat={lat}&log={log}&img={img}&date={date}&tag={tag}
 	@GetMapping(value = "/create")
 	public memo createFromParams(
     	@RequestParam String content,
@@ -36,6 +40,38 @@ public class memoController {
     	memo newMemo = new memo(content, writer, lat, log, img, date, tag);
     	return boardRep.save(newMemo);
 	}
+
+	// URL POST 메모 생성
+	@PostMapping("/upload")
+	public String createMemo(
+		@RequestParam("file") MultipartFile file,
+		@RequestParam("content") String content,
+		@RequestParam("writer") String writer,
+		@RequestParam("lat") String lat,
+		@RequestParam("log") String log,
+		@RequestParam("date") String date,
+		@RequestParam("tag") String tag) throws IOException {
+
+			String uploadPath = "/uploaded/";
+			String filename = file.getOriginalFilename();
+			File dest = new File(uploadPath + filename);
+			file.transferTo(dest);
+
+			String img = "http://localhost:8080/uploaded/" + filename;
+
+			memo item = new memo();
+			item.setContent(content);
+			item.setWriter(writer);
+			item.setLat(lat);
+			item.setLog(log);
+			item.setDate(date);
+			item.setImg(img);
+			item.setTag(tag);
+
+			boardRep.save(item);
+
+			return "Memo create Success";
+		}
 	
     //메모 전체 로드 : {url}/memo - 작동
 	@GetMapping
