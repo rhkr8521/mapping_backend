@@ -82,7 +82,7 @@ public class memoController {
         	memoToUpdate.setTag(tag);
         	return boardRep.save(memoToUpdate);
     	} else {
-        	throw new EntityNotFoundException("Memo with id " + id + " not found");
+        	throw new EntityNotFoundException("Error) M" + id + " Memo not found");
     	}
 	}
 
