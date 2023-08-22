@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>메모작성 테스트 페이지</title>
+    </head>
+    <body>
+        <form action="http://localhost:8080/memo/upload" method="post" enctype="multipart/form-data">
+            <p>Content: <input type="text" name="content" /></p>
+            <p>Writer: <input type="text" name="writer" /></p>
+            <p>lat: <input type="text" name="lat" /></p>
+            <p>log: <input type="text" name="log" /></p>
+            <p>date: <input type="text" name="date" /></p>
+            <p>tag: <input type="text" name="tag" /></p>
+            <p></p><input type="file" name="file"></p>
+            <input type="submit" value="Create" />
+        </form>
+    </body>
+</html>

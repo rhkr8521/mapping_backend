@@ -3,6 +3,9 @@ package com.mapping.mapping.memo;
 import java.util.List;
 import java.util.Optional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -41,37 +45,56 @@ public class memoController {
     	return boardRep.save(newMemo);
 	}
 
-	// URL POST 메모 생성
-	@PostMapping("/upload")
-	public String createMemo(
-		@RequestParam("file") MultipartFile file,
-		@RequestParam("content") String content,
-		@RequestParam("writer") String writer,
-		@RequestParam("lat") String lat,
-		@RequestParam("log") String log,
-		@RequestParam("date") String date,
-		@RequestParam("tag") String tag) throws IOException {
+    // URL POST 메모 생성 : POST(enctype="multipart/form-data") -> {url}/upload
+    @PostMapping("/upload")
+    public String createMemo(
+        @RequestParam("file") MultipartFile file,
+        @RequestParam("content") String content,
+        @RequestParam("writer") String writer,
+        @RequestParam("lat") String lat,
+        @RequestParam("log") String log,
+        @RequestParam("tag") String tag) throws IOException {
 
-			String uploadPath = "/uploaded/";
-			String filename = file.getOriginalFilename();
-			File dest = new File(uploadPath + filename);
-			file.transferTo(dest);
+			LocalDateTime nowDate = LocalDateTime.now();
+	
+			String nowDate_DB = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+			String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+			String nowDate_fd = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-			String img = "http://localhost:8080/uploaded/" + filename;
+            String uploadPath = "/Users/rhkr8521/Desktop/mapping/uploadimage/" + nowDate_fd + "/";
 
-			memo item = new memo();
-			item.setContent(content);
-			item.setWriter(writer);
-			item.setLat(lat);
-			item.setLog(log);
-			item.setDate(date);
-			item.setImg(img);
-			item.setTag(tag);
+			File UploadFolder = new File(uploadPath);
 
-			boardRep.save(item);
+			if (!UploadFolder.exists()) {
+				try{
+		    		UploadFolder.mkdir(); // 날짜폴더 생성
+	        		} 
+	        		catch(Exception e){
+		    		e.getStackTrace();
+				}        
+         		}else {
+			}
 
-			return "Memo create Success";
-		}
+            //String filename = file.getOriginalFilename();
+            File dest = new File(uploadPath + nowDate_Img + "_" + writer + ".jpg");
+            file.transferTo(dest);
+
+            String img = "http://localhost:8080/image-upload/" + nowDate_Img + "_" + writer + ".jpg";
+
+            memo item = new memo();
+            item.setContent(content);
+            item.setWriter(writer);
+            item.setLat(lat);
+            item.setLog(log);
+            item.setDate(nowDate_DB);
+            item.setImg(img);
+            item.setTag(tag);
+
+            boardRep.save(item);
+
+            return "INFO) Memo create Success";
+        }
+
 	
     //메모 전체 로드 : {url}/memo - 작동
 	@GetMapping
@@ -103,18 +126,21 @@ public class memoController {
 		return boardRep.findByTag(tag);
 	}
 
-    //메모수정 : {url}/memo/update/{id}?content={content}&writer={writer}&lat={lat}&log={log}&img={img}&date={date}&tag={tag}
+    //메모수정 : {url}/memo/update/{id}?content={content}&writer={writer}&lat={lat}&log={log}&tag={tag} - 이미지수정 비할성화
 	@GetMapping(value = "/update/{id}")
-	public memo update(@PathVariable Long id, @RequestParam String content, @RequestParam String writer, @RequestParam String lat, @RequestParam String log, @RequestParam String img, @RequestParam String date, @RequestParam String tag) {
+	public memo update(@PathVariable Long id, @RequestParam String content, @RequestParam String writer, @RequestParam String lat, @RequestParam String log, @RequestParam String tag) {
 		Optional<memo> board = boardRep.findById(id);
     	if (board.isPresent()) {
+
+			LocalDateTime nowDate = LocalDateTime.now();
+			String Update_Date_DB = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
         	memo memoToUpdate = board.get();
         	memoToUpdate.setContent(content);
         	memoToUpdate.setWriter(writer);
         	memoToUpdate.setLat(lat);
         	memoToUpdate.setLog(log);
-        	memoToUpdate.setImg(img);
-        	memoToUpdate.setDate(date);
+        	memoToUpdate.setDate(Update_Date_DB);
         	memoToUpdate.setTag(tag);
         	return boardRep.save(memoToUpdate);
     	} else {
