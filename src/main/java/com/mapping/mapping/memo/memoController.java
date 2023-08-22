@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,13 +62,14 @@ public class memoController {
 			String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
 			String nowDate_fd = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-            String uploadPath = "/Users/rhkr8521/Desktop/mapping/uploadimage/" + nowDate_fd + "/";
+			//이미지 업로드 경로 지정(절대경로)
+            String uploadPath = "${SERVER_IMGSAVE_ADDR}" + nowDate_fd + "/";
 
 			File UploadFolder = new File(uploadPath);
 
 			if (!UploadFolder.exists()) {
 				try{
-		    		UploadFolder.mkdir(); // 날짜폴더 생성
+		    		UploadFolder.mkdir(); //만약 해당 날짜 폴더가 없다면 생성
 	        		} 
 	        		catch(Exception e){
 		    		e.getStackTrace();
@@ -79,7 +81,8 @@ public class memoController {
             File dest = new File(uploadPath + nowDate_Img + "_" + writer + ".jpg");
             file.transferTo(dest);
 
-            String img = "http://localhost:8080/image-upload/" + nowDate_Img + "_" + writer + ".jpg";
+			//저장된 이미지 불러오는 서버 주소
+            String img = "http://${SERVER_DOMAIN}:${SERVER_PORT}/images/" + nowDate_fd + "/" + nowDate_Img + "_" + writer + ".jpg";
 
             memo item = new memo();
             item.setContent(content);
