@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +25,15 @@ import jakarta.persistence.EntityNotFoundException;
 @RequestMapping(value = "/memo")
 public class memoController {
 	private memoRepository boardRep;
+
+	@Value("${C_SERVER_IMGSAVE_ADDR}")
+	private String SERVER_IMGSAVE_ADDR;
+
+	@Value("${C_SERVER_DOMAIN}")
+	private String SERVER_DOMAIN;
+
+	//@Value("${C_SERVER_B_PORT}")
+	//private int SERVER_B_PORT;
 	
 	@Autowired	
 	public memoController(memoRepository boardRep) {
@@ -63,7 +72,7 @@ public class memoController {
 			String nowDate_fd = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
 			//이미지 업로드 경로 지정(절대경로)
-            String uploadPath = "${SERVER_IMGSAVE_ADDR}" + nowDate_fd + "/";
+            String uploadPath = SERVER_IMGSAVE_ADDR + "/"+ nowDate_fd + "/";
 
 			File UploadFolder = new File(uploadPath);
 
@@ -82,7 +91,7 @@ public class memoController {
             file.transferTo(dest);
 
 			//저장된 이미지 불러오는 서버 주소
-            String img = "http://${SERVER_DOMAIN}:${SERVER_PORT}/images/" + nowDate_fd + "/" + nowDate_Img + "_" + writer + ".jpg";
+            String img = "http://" + SERVER_DOMAIN + ":8080/images/" + nowDate_fd + "/" + nowDate_Img + "_" + writer + ".jpg";
 
             memo item = new memo();
             item.setContent(content);
