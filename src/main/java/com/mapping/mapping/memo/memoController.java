@@ -31,9 +31,6 @@ public class memoController {
 
 	@Value("${C_SERVER_DOMAIN}")
 	private String SERVER_DOMAIN;
-
-	//@Value("${C_SERVER_B_PORT}")
-	//private int SERVER_B_PORT;
 	
 	@Autowired	
 	public memoController(memoRepository boardRep) {
