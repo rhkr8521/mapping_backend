@@ -16,17 +16,17 @@ public class memo {
     private String content;
     private String writer;
     private String lat;
-    private String log;
+    private String lng;
     private String img;
     private String date;
     private String tag;
     public memo() {
     }
-    public memo(String content, String writer, String lat, String log, String img, String date, String tag) {
+    public memo(String content, String writer, String lat, String lng, String img, String date, String tag) {
         this.content = content;
         this.writer = writer;
         this.lat = lat;
-        this.log = log;
+        this.lng = lng;
         this.img = img;
         this.date = date;
         this.tag = tag;
