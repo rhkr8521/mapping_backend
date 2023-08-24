@@ -83,21 +83,30 @@ public class memoController {
          		}else {
 			}
 
-			//String filename = file.getOriginalFilename();
-            File dest = new File(uploadPath + nowDate_Img + "_" + writer + ".jpg");
-            file.transferTo(dest);
+			String filename = file.getOriginalFilename();
 
-			//저장된 이미지 불러오는 서버 주소
-            String img = "http://" + SERVER_DOMAIN + ":8080/images/" + nowDate_fd + "/" + nowDate_Img + "_" + writer + ".jpg";
-
-            memo item = new memo();
+			memo item = new memo();
             item.setContent(content);
             item.setWriter(writer);
             item.setLat(lat);
             item.setLng(lng);
             item.setDate(nowDate_DB);
-            item.setImg(img);
             item.setTag(tag);
+
+			// 만약 이미지파일이 들어오지않았을때 null 처리
+			if (filename == ""){
+				String img = "null";
+				item.setImg(img);
+				System.out.println(filename);
+				
+			}else{
+				File dest = new File(uploadPath + nowDate_Img + "_" + writer + ".jpg");
+            	file.transferTo(dest);
+
+				//저장된 이미지 불러오는 서버 주소
+            	String img = "http://" + SERVER_DOMAIN + ":8080/images/" + nowDate_fd + "/" + nowDate_Img + "_" + writer + ".jpg";
+           		item.setImg(img);
+			}
 
             boardRep.save(item);
 
