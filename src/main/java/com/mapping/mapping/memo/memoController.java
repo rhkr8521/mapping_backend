@@ -36,19 +36,19 @@ public class memoController {
 	public memoController(memoRepository boardRep) {
 		this.boardRep = boardRep;
 	}
-	
-    // URL GET 메모 생성: {url}/memo/create?content={content}&writer={writer}&lat={lat}&log={log}&img={img}&date={date}&tag={tag}
+
+    // URL GET 메모 생성: {url}/memo/create?content={content}&writer={writer}&lat={lat}&lng={lng}&img={img}&date={date}&tag={tag}
 	@GetMapping(value = "/create")
 	public memo createFromParams(
     	@RequestParam String content,
     	@RequestParam String writer,
     	@RequestParam String lat,
-    	@RequestParam String log,
+    	@RequestParam String lng,
     	@RequestParam String img,
     	@RequestParam String date,
     	@RequestParam String tag
 	) {
-    	memo newMemo = new memo(content, writer, lat, log, img, date, tag);
+    	memo newMemo = new memo(content, writer, lat, lng, img, date, tag);
     	return boardRep.save(newMemo);
 	}
 
@@ -59,7 +59,7 @@ public class memoController {
         @RequestParam("content") String content,
         @RequestParam("writer") String writer,
         @RequestParam("lat") String lat,
-        @RequestParam("log") String log,
+        @RequestParam("lng") String lng,
         @RequestParam("tag") String tag) throws IOException {
 
 			LocalDateTime nowDate = LocalDateTime.now();
@@ -83,7 +83,7 @@ public class memoController {
          		}else {
 			}
 
-            //String filename = file.getOriginalFilename();
+			//String filename = file.getOriginalFilename();
             File dest = new File(uploadPath + nowDate_Img + "_" + writer + ".jpg");
             file.transferTo(dest);
 
@@ -94,7 +94,7 @@ public class memoController {
             item.setContent(content);
             item.setWriter(writer);
             item.setLat(lat);
-            item.setLog(log);
+            item.setLng(lng);
             item.setDate(nowDate_DB);
             item.setImg(img);
             item.setTag(tag);
@@ -135,9 +135,9 @@ public class memoController {
 		return boardRep.findByTag(tag);
 	}
 
-    //메모수정 : {url}/memo/update/{id}?content={content}&writer={writer}&lat={lat}&log={log}&tag={tag} - 이미지수정 비할성화
+    //메모수정 : {url}/memo/update/{id}?content={content}&writer={writer}&lat={lat}&lng={lng}&tag={tag} - 이미지수정 비할성화
 	@GetMapping(value = "/update/{id}")
-	public memo update(@PathVariable Long id, @RequestParam String content, @RequestParam String writer, @RequestParam String lat, @RequestParam String log, @RequestParam String tag) {
+	public memo update(@PathVariable Long id, @RequestParam String content, @RequestParam String writer, @RequestParam String lat, @RequestParam String lng, @RequestParam String tag) {
 		Optional<memo> board = boardRep.findById(id);
     	if (board.isPresent()) {
 
@@ -148,7 +148,7 @@ public class memoController {
         	memoToUpdate.setContent(content);
         	memoToUpdate.setWriter(writer);
         	memoToUpdate.setLat(lat);
-        	memoToUpdate.setLog(log);
+        	memoToUpdate.setLng(lng);
         	memoToUpdate.setDate(Update_Date_DB);
         	memoToUpdate.setTag(tag);
         	return boardRep.save(memoToUpdate);
