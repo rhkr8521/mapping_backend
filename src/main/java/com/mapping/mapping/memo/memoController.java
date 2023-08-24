@@ -73,9 +73,10 @@ public class memoController {
 
 			File UploadFolder = new File(uploadPath);
 
+			 //만약 해당 날짜 폴더가 없다면 생성
 			if (!UploadFolder.exists()) {
 				try{
-		    		UploadFolder.mkdir(); //만약 해당 날짜 폴더가 없다면 생성
+		    		UploadFolder.mkdir();
 	        		} 
 	        		catch(Exception e){
 		    		e.getStackTrace();
@@ -97,8 +98,7 @@ public class memoController {
 			if (filename == ""){
 				String img = "null";
 				item.setImg(img);
-				System.out.println(filename);
-				
+
 			}else{
 				File dest = new File(uploadPath + nowDate_Img + "_" + writer + ".jpg");
             	file.transferTo(dest);
@@ -107,7 +107,7 @@ public class memoController {
             	String img = "http://" + SERVER_DOMAIN + ":8080/images/" + nowDate_fd + "/" + nowDate_Img + "_" + writer + ".jpg";
            		item.setImg(img);
 			}
-
+			
             boardRep.save(item);
 
             return "INFO) Memo create Success";
