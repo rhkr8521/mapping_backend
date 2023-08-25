@@ -21,7 +21,7 @@ public class TokenProvider {
     private static final String SECURITY_KEY = "jwtseckey!@";
 
     // JWT 생성하는 메서드
-    public String create(UserEntity userEntity){
+    public String create(String userNickname){
         // 만료날짜를 현재 날짜 + 1시간으로 설정
         Date exprTime = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
 
@@ -30,7 +30,7 @@ public class TokenProvider {
             //암호화에 사용될 알고리즘, 키
             .signWith(SignatureAlgorithm.HS512,SECURITY_KEY)
             // JWT 제목, 생성일 , 만료일
-            .setSubject(String.valueOf(userEntity.getUserNickname())).setIssuedAt(new Date()).setExpiration(exprTime)
+            .setSubject(userNickname).setIssuedAt(new Date()).setExpiration(exprTime)
             //생성
             .compact();
     }

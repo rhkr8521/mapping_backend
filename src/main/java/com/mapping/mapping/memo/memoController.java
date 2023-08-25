@@ -1,5 +1,7 @@
 package com.mapping.mapping.memo;
 
+import com.mapping.mapping.user.controller.BoardController;
+import com.mapping.mapping.user.security.TokenProvider;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,22 +28,18 @@ import jakarta.persistence.EntityNotFoundException;
 // CROS 설정 - 개빡치는놈
 @CrossOrigin("*")
 @RestController
-@RequestMapping(value = "/memo")
-public class memoController {
+@RequestMapping(value = "/api/memo")
+public class memoController{
 	private memoRepository boardRep;
-
-	@Value("${C_SERVER_IMGSAVE_ADDR}")
-	private String SERVER_IMGSAVE_ADDR;
-
-	@Value("${C_SERVER_DOMAIN}")
-	private String SERVER_DOMAIN;
 	
 	@Autowired	
 	public memoController(memoRepository boardRep) {
 		this.boardRep = boardRep;
 	}
 
+
     // URL POST 메모 생성 : POST(enctype="multipart/form-data") -> {url}/upload
+
     @PostMapping("/upload")
     public String createMemo(
         @RequestParam(value = "file",required = false) MultipartFile file,
@@ -48,7 +47,9 @@ public class memoController {
         @RequestParam("writer") String writer,
         @RequestParam("lat") String lat,
         @RequestParam("lng") String lng,
-        @RequestParam("tag") String tag) throws IOException {
+        @RequestParam("tag") String tag
+
+	) throws IOException {
 
 			LocalDateTime nowDate = LocalDateTime.now();
 	
@@ -57,7 +58,7 @@ public class memoController {
 			String nowDate_fd = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
 			//이미지 업로드 경로 지정(절대경로)
-            String uploadPath = SERVER_IMGSAVE_ADDR + "/"+ nowDate_fd + "/";
+            String uploadPath = "/home/mapping/mapping/images/"+ nowDate_fd + "/";
 
 			File UploadFolder = new File(uploadPath);
 
@@ -71,6 +72,7 @@ public class memoController {
 				}        
          		}else {
 			}
+
 
 			memo item = new memo();
             item.setContent(content);
@@ -90,7 +92,7 @@ public class memoController {
             	file.transferTo(dest);
 
 				//저장된 이미지 불러오는 서버 주소
-            	String img = "http://" + SERVER_DOMAIN + ":8080/images/" + nowDate_fd + "/" + nowDate_Img + "_" + writer + ".jpg";
+            	String img = "http://mapping.kro.kr:8080/images/" + nowDate_fd + "/" + nowDate_Img + "_" + writer + ".jpg";
            		item.setImg(img);
 			}
 			
@@ -196,3 +198,4 @@ public class memoController {
 	}
 
 }
+
