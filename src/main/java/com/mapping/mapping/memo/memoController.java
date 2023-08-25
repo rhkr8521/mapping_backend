@@ -43,7 +43,7 @@ public class memoController {
     // URL POST 메모 생성 : POST(enctype="multipart/form-data") -> {url}/upload
     @PostMapping("/upload")
     public String createMemo(
-        @RequestParam("file") MultipartFile file,
+        @RequestParam(value = "file",required = false) MultipartFile file,
         @RequestParam("content") String content,
         @RequestParam("writer") String writer,
         @RequestParam("lat") String lat,
@@ -72,8 +72,6 @@ public class memoController {
          		}else {
 			}
 
-			String filename = file.getOriginalFilename();
-
 			memo item = new memo();
             item.setContent(content);
             item.setWriter(writer);
@@ -83,7 +81,7 @@ public class memoController {
             item.setTag(tag);
 
 			// 만약 이미지파일이 들어오지않았을때 null 처리
-			if (filename == ""){
+			if (file == null || file.isEmpty()){
 				String img = "null";
 				item.setImg(img);
 
