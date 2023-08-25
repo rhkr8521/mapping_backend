@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,8 @@ import java.io.IOException;
 
 import jakarta.persistence.EntityNotFoundException;
 
+// CROS 설정 - 개빡치는놈
+@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/memo")
 public class memoController {
@@ -35,21 +38,6 @@ public class memoController {
 	@Autowired	
 	public memoController(memoRepository boardRep) {
 		this.boardRep = boardRep;
-	}
-
-    // URL GET 메모 생성: {url}/memo/create?content={content}&writer={writer}&lat={lat}&lng={lng}&img={img}&date={date}&tag={tag}
-	@GetMapping(value = "/create")
-	public memo createFromParams(
-    	@RequestParam String content,
-    	@RequestParam String writer,
-    	@RequestParam String lat,
-    	@RequestParam String lng,
-    	@RequestParam String img,
-    	@RequestParam String date,
-    	@RequestParam String tag
-	) {
-    	memo newMemo = new memo(content, writer, lat, lng, img, date, tag);
-    	return boardRep.save(newMemo);
 	}
 
     // URL POST 메모 생성 : POST(enctype="multipart/form-data") -> {url}/upload
@@ -110,6 +98,8 @@ public class memoController {
 			
             boardRep.save(item);
 
+			
+			System.out.println("\n" + nowDate_Img + ") 메모 생성 완료");
             return "INFO) Memo create Success";
         }
 
@@ -117,30 +107,58 @@ public class memoController {
     //메모 전체 로드 : {url}/memo - 작동
 	@GetMapping
 	public Iterable<memo> list(){
+
+		LocalDateTime nowDate = LocalDateTime.now();
+		String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+
+		System.out.println("\n" + nowDate_Img + ") 메모 전체 로드 완료");
 		return boardRep.findAll();
 	}
 	
     //ID검색 : {url}/memo/info/{id}
 	@GetMapping(value = "/info/{id}")
 	public Optional<memo> findOne(@PathVariable Long id) {
+
+		LocalDateTime nowDate = LocalDateTime.now();
+		String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+
+		System.out.println("\n" + nowDate_Img + ") ID 기준 메모 검색 완료");
 		return boardRep.findById(id);
 	}
 
 	//내용 일부 검색 : {url}/memo/content_search?content={검색할 내용}
 	@GetMapping(value = "/content_search")
 	public List<memo> searchByContent(@RequestParam String content) {
+
+		LocalDateTime nowDate = LocalDateTime.now();
+		String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+
+		System.out.println("\n" + nowDate_Img + ") 메모 컨텐츠 검색 완료");
+
     	return boardRep.findByContentContains(content);
 	}
 
 	//작성자검색 : {url}/memo/search?writer={writer}
 	@GetMapping(value = "/search")
 	public List<memo> searchByWriter(@RequestParam String writer) {
+
+		LocalDateTime nowDate = LocalDateTime.now();
+		String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+
+		System.out.println("\n" + nowDate_Img + ") 작성자 기준 메모 검색 완료");
+
     	return boardRep.findByWriter(writer);
 	}
 
 	//태그검색 : {url}/memo/tagsearch?tag={tag}
 	@GetMapping(value = "/tagsearch")
 	public List<memo> searchByTag(@RequestParam String tag){
+
+		LocalDateTime nowDate = LocalDateTime.now();
+		String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+
+		System.out.println("\n" + nowDate_Img + ") 태그 기준 메모 로드 완료");
+
 		return boardRep.findByTag(tag);
 	}
 
@@ -160,6 +178,8 @@ public class memoController {
         	memoToUpdate.setLng(lng);
         	memoToUpdate.setDate(Update_Date_DB);
         	memoToUpdate.setTag(tag);
+
+			System.out.println("\n" + Update_Date_DB + ") ID : " + id  + " 메모 정보 업데이트 완료");
         	return boardRep.save(memoToUpdate);
     	} else {
         	throw new EntityNotFoundException("Error) M" + id + " Memo not found");
@@ -170,6 +190,11 @@ public class memoController {
 	@GetMapping(value = "/delete")
 	public void deleteById(@RequestParam(value = "id") Long id) {
     	boardRep.deleteById(id);
+
+		LocalDateTime nowDate = LocalDateTime.now();
+		String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+
+		System.out.println("\n" + nowDate_Img + ") ID : " + id + " 메모 삭제 완료");
 	}
 
 }
