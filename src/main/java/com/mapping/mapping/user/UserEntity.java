@@ -25,18 +25,13 @@ public class UserEntity {
     @Column(unique=true,nullable = false)
     @NotEmpty(message = "사용자 Nickname 필수항목입니다.")
     private String userNickname;
-    @Column(unique=true,nullable = false)
-    @NotEmpty(message = "사용자 휴대번호는 필수항목입니다.")
-    private String userPhoneNumber;
-    private String userAddress;
-    private String userProfile;
+
 
     public UserEntity(SignUpDto dto){
         this.userEmail = dto.getUserEmail();
         this.userPassword = dto.getUserPassword();
         this.userNickname = dto.getUserNickname();
-        this.userPhoneNumber = dto.getUserPhoneNumber();
-        this.userAddress = dto.getUserAddress() + " " + dto.getUserAddressdetail();
+
     }
 }
 

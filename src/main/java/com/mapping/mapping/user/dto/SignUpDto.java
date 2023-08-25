@@ -12,7 +12,5 @@ public class SignUpDto {
     private String userPassword;
     private String userPasswordcheck;
     private String userNickname;
-    private String userPhoneNumber;
-    private String userAddress;
-    private String userAddressdetail;
+
 }
