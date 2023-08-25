@@ -47,22 +47,6 @@ public class memoController{
 	@Autowired
     private TokenProvider tokenProvider;
 
-	@PostMapping("/token")
-	public String tokentest(HttpServletRequest request) {
-		try {
-			String token = parseBearerToken(request);
-			if (token != null && !token.equalsIgnoreCase("null")) {
-				String userNickname = tokenProvider.validate(token);
-	
-				return userNickname;
-			}
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			return "Exception occurred: " + exception.getMessage();
-		}
-		return "An error occurred";
-	}
-
  	// URL POST 메모 생성 : POST(enctype="multipart/form-data") -> {url}/upload
     @PostMapping("/upload")
     public String createMemo(
@@ -79,7 +63,7 @@ public class memoController{
                     String userNickname = tokenProvider.validate(token);
 
             if (userNickname == null){
-                //돌아가
+                return "잘못된 접근입니다.";
             }else{
             LocalDateTime nowDate = LocalDateTime.now();
     
@@ -121,7 +105,7 @@ public class memoController{
                 file.transferTo(dest);
 
                 //저장된 이미지 불러오는 서버 주소
-                String img = "http://" + SERVER_DOMAIN + ":8080/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
+                String img = "http://" + SERVER_DOMAIN + ":8080/api/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
                 item.setImg(img);
             }
             
@@ -135,7 +119,7 @@ public class memoController{
             }catch(Exception exception){
                 exception.printStackTrace();
             }
-        return "INFO) Memo create fail"; // 예외 발생 시 반환 값
+        return "INFO) Memo create fail";
     }   
 	
     //메모 전체 로드 : {url}/memo - 작동
@@ -189,18 +173,11 @@ public class memoController{
         	}
     	} catch (Exception exception) {
         	exception.printStackTrace();
-        	// 예외 발생 시 메시지를 반환
-        	//List<memo> errorResponse = new ArrayList<>();
-        	//memo errorMessageMemo = new memo();
-        	//errorMessageMemo.setContent("Exception occurred: " + exception.getMessage());
-        	//errorResponse.add(errorMessageMemo);
-        	//return errorResponse;
     	}
 
-    	// 여기까지 도달하는 경우, 예외 또는 조건에 부합하지 않음을 나타냄
-    	return Collections.emptyList(); // 빈 리스트 반환
+		// 빈 리스트 반환
+    	return Collections.emptyList();
 	}
-
 
 	//태그검색 : {url}/memo/tagsearch?tag={tag}
 	@GetMapping(value = "/tagsearch")
@@ -214,7 +191,7 @@ public class memoController{
 		return boardRep.findByTag(tag);
 	}
 
-    //메모수정 : {url}/memo/update/{id}?content={content}&writer={writer}&lat={lat}&lng={lng}&tag={tag} - 이미지수정 비할성화
+    //메모수정 : {url}/memo/update/{id}?content={content}&writer={writer}&lat={lat}&lng={lng}&tag={tag} - 이미지수정 비할성화 / (토큰인증요망)
 	@GetMapping(value = "/update/{id}")
 	public memo update(@PathVariable Long id, @RequestParam String content, @RequestParam String writer, @RequestParam String lat, @RequestParam String lng, @RequestParam String tag) {
 		Optional<memo> board = boardRep.findById(id);
