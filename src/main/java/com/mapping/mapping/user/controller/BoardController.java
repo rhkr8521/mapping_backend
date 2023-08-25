@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/board")
 public class BoardController {
     @GetMapping("/")
-    public String getBoard(@AuthenticationPrincipal  String userNickname ){
+    public String getBoard(@AuthenticationPrincipal String userNickname ){
         return userNickname ;
     }
 
