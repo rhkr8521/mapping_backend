@@ -220,23 +220,40 @@ public class memoController{
 	
 						LocalDateTime nowDate = LocalDateTime.now();
 						String nowDate_DB = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	            		String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+            			String nowDate_fd = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+						//이미지 업로드 경로 지정(절대경로)
+           				String uploadPath = SERVER_IMGSAVE_ADDR + "/"+ nowDate_fd + "/";
+            			File UploadFolder = new File(uploadPath);
+
+						//만약 해당 날짜 폴더가 없다면 생성
+            			if (!UploadFolder.exists()) {
+                			try{
+                    		UploadFolder.mkdir();
+                    	} 
+                    		catch(Exception e){
+                    		e.getStackTrace();
+                		}        
+                		}
 	
+						// 만약 이미지파일이 들어오지않았을때 null 처리
+            			if (file == null || file.isEmpty()){
+
+            			}else{
+                		File dest = new File(uploadPath + nowDate_Img + "_" + userNickname + ".jpg");
+                		file.transferTo(dest);
+
+               		 	//저장된 이미지 불러오는 서버 주소
+                		String img = "https://" + SERVER_DOMAIN + ":81/api/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
+                		memoToUpdate.setImg(img);
+            		}
+
 						memoToUpdate.setContent(content);
 						memoToUpdate.setLat(lat);
 						memoToUpdate.setLng(lng);
 						memoToUpdate.setDate(nowDate_DB);
 						memoToUpdate.setTag(tag);
-	
-						if (file != null && !file.isEmpty()) {
-							String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
-							String uploadPath = SERVER_IMGSAVE_ADDR + "/" + nowDate_DB + "/";
-	
-							File dest = new File(uploadPath + nowDate_Img + "_" + userNickname + ".jpg");
-							file.transferTo(dest);
-	
-							String img = "https://" + SERVER_DOMAIN + ":81/api/images/" + nowDate_DB + "/" + nowDate_Img + "_" + userNickname + ".jpg";
-							memoToUpdate.setImg(img);
-						}
 	
 						boardRep.save(memoToUpdate);
 	
