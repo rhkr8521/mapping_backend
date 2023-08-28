@@ -105,7 +105,7 @@ public class memoController{
                 file.transferTo(dest);
 
                 //저장된 이미지 불러오는 서버 주소
-                String img = "http://" + SERVER_DOMAIN + ":8080/api/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
+                String img = "https://" + SERVER_DOMAIN + ":81/api/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
                 item.setImg(img);
             }
             
@@ -191,29 +191,83 @@ public class memoController{
 		return boardRep.findByTag(tag);
 	}
 
-    //메모수정 : {url}/memo/update/{id}?content={content}&writer={writer}&lat={lat}&lng={lng}&tag={tag} - 이미지수정 비할성화 / (토큰인증요망)
-	@GetMapping(value = "/update/{id}")
-	public memo update(@PathVariable Long id, @RequestParam String content, @RequestParam String writer, @RequestParam String lat, @RequestParam String lng, @RequestParam String tag) {
-		Optional<memo> board = boardRep.findById(id);
-    	if (board.isPresent()) {
+	//메모 수정 : {url}/update{id}
+	@PostMapping("/update/{id}")
+	public String updateMemo(
+		HttpServletRequest request,
+		@PathVariable Long id,
+		@RequestParam(value = "file", required = false) MultipartFile file,
+		@RequestParam("content") String content,
+		@RequestParam("lat") String lat,
+		@RequestParam("lng") String lng,
+		@RequestParam("tag") String tag) throws IOException {
+	
+		try {
+			String token = parseBearerToken(request);
+			if (token != null && !token.equalsIgnoreCase("null")) {
+				String userNickname = tokenProvider.validate(token);
+	
+				if (userNickname == null) {
+					return "잘못된 접근입니다.";
+				} else {
+					Optional<memo> memoOptional = boardRep.findById(id);
+					if (memoOptional.isPresent()) {
+						memo memoToUpdate = memoOptional.get();
+	
+						if (!memoToUpdate.getWriter().equals(userNickname)) {
+							return "작성자와 로그인 사용자가 다릅니다.";
+						}
+	
+						LocalDateTime nowDate = LocalDateTime.now();
+						String nowDate_DB = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	            		String nowDate_Img = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+            			String nowDate_fd = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-			LocalDateTime nowDate = LocalDateTime.now();
-			String Update_Date_DB = nowDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+						//이미지 업로드 경로 지정(절대경로)
+           				String uploadPath = SERVER_IMGSAVE_ADDR + "/"+ nowDate_fd + "/";
+            			File UploadFolder = new File(uploadPath);
 
-        	memo memoToUpdate = board.get();
-        	memoToUpdate.setContent(content);
-        	memoToUpdate.setWriter(writer);
-        	memoToUpdate.setLat(lat);
-        	memoToUpdate.setLng(lng);
-        	memoToUpdate.setDate(Update_Date_DB);
-        	memoToUpdate.setTag(tag);
+						//만약 해당 날짜 폴더가 없다면 생성
+            			if (!UploadFolder.exists()) {
+                			try{
+                    		UploadFolder.mkdir();
+                    	} 
+                    		catch(Exception e){
+                    		e.getStackTrace();
+                		}        
+                		}
+	
+						// 만약 이미지파일이 들어오지않았을때 null 처리
+            			if (file == null || file.isEmpty()){
 
-			System.out.println("\n" + Update_Date_DB + ") ID : " + id  + " 메모 정보 업데이트 완료");
-        	return boardRep.save(memoToUpdate);
-    	} else {
-        	throw new EntityNotFoundException("Error) M" + id + " Memo not found");
-    	}
+            			}else{
+                		File dest = new File(uploadPath + nowDate_Img + "_" + userNickname + ".jpg");
+                		file.transferTo(dest);
+
+               		 	//저장된 이미지 불러오는 서버 주소
+                		String img = "https://" + SERVER_DOMAIN + ":81/api/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
+                		memoToUpdate.setImg(img);
+            		}
+
+						memoToUpdate.setContent(content);
+						memoToUpdate.setLat(lat);
+						memoToUpdate.setLng(lng);
+						memoToUpdate.setDate(nowDate_DB);
+						memoToUpdate.setTag(tag);
+	
+						boardRep.save(memoToUpdate);
+	
+						System.out.println("\n" + nowDate_DB + ") 메모 업데이트 완료");
+						return "INFO) Memo update Success";
+					}
+				}
+			}
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+		return "INFO) Memo update fail";
 	}
+	
 
     //메모삭제 : {url}/memo/delete?id={id}
 	@GetMapping(value = "/delete")

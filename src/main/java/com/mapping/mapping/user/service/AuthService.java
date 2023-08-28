@@ -27,15 +27,7 @@ public class AuthService {
         String userPassword = dto.getUserPassword();
         String userPasswordCheck = dto.getUserPasswordcheck();
         String userNickname = dto.getUserNickname();
-        String userPhoneNumber = dto.getUserPhoneNumber();
 
-        //PhoneNumber 중복 확인
-        try{
-            if(userRepository.existsByUserPhoneNumber(userPhoneNumber))
-                return ResponseDto.setFailed("이미 등록된 전화번호입니다!");
-        }catch (Exception e){
-            return ResponseDto.setFailed("db 에러!");
-        }
         //nickname 중복 확인
         try{
             if(userRepository.existsByUserNickname(userNickname))
