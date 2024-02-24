@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 @Service
 public class AuthService {
@@ -22,11 +24,30 @@ public class AuthService {
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    // 이메일 형식을 검증하는 정규 표현식
+    private static final String EMAIL_PATTERN = 
+    "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+
+    private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+
+    public static boolean isValidEmail(String email) {
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
+
     public ResponseDto<?> signUp(SignUpDto dto) {
         String userEmail = dto.getUserEmail();
         String userPassword = dto.getUserPassword();
         String userPasswordCheck = dto.getUserPasswordcheck();
         String userNickname = dto.getUserNickname();
+
+        //이메일 형식 체크
+        try{
+            if (!isValidEmail(userEmail))
+                return ResponseDto.setFailed("유효하지 않은 이메일 형식입니다!");
+        }catch (Exception e){
+            return ResponseDto.setFailed("db 에러!");
+        }
 
         //nickname 중복 확인
         try{
