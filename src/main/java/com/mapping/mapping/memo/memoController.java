@@ -26,7 +26,7 @@ import java.io.IOException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
-// CROS 설정 - 개빡치는놈
+// CORS 설정 - 개빡치는놈
 @CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/api/memo")
