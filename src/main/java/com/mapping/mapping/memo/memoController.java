@@ -103,17 +103,21 @@ public class memoController{
                 item.setImg(img);
 
             }else{
-                File dest = new File(uploadPath + nowDate_Img + "_" + userNickname + ".jpg");
-                file.transferTo(dest);
+					String contentType = file.getContentType();
+					if (contentType == null || (!contentType.startsWith("image/jpeg") && !contentType.startsWith("image/jpg") && !contentType.startsWith("image/png"))) {
+						return "Only image files are allowed.";
+				}else{
+					File dest = new File(uploadPath + nowDate_Img + "_" + userNickname + ".jpg");
+					file.transferTo(dest);
 
-                //저장된 이미지 불러오는 서버 주소
-                String img = "https://" + SERVER_DOMAIN + ":81/api/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
-                item.setImg(img);
+					//저장된 이미지 불러오는 서버 주소
+					String img = "https://" + SERVER_DOMAIN + ":81/api/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
+					item.setImg(img);
+				}   
             }
             
             boardRep.save(item);
 
-            
             System.out.println("\n" + nowDate_Img + ") 메모 생성 완료");
             return "INFO) Memo create Success";
                 }
@@ -244,12 +248,17 @@ public class memoController{
             			if (file == null || file.isEmpty()){
 
             			}else{
-                		File dest = new File(uploadPath + nowDate_Img + "_" + userNickname + ".jpg");
-                		file.transferTo(dest);
+							String contentType = file.getContentType();
+							if (contentType == null || (!contentType.startsWith("image/jpeg") && !contentType.startsWith("image/jpg") && !contentType.startsWith("image/png"))) {
+								return "Only image files are allowed.";
+						}else{
+							File dest = new File(uploadPath + nowDate_Img + "_" + userNickname + ".jpg");
+							file.transferTo(dest);
 
-               		 	//저장된 이미지 불러오는 서버 주소
-                		String img = "https://" + SERVER_DOMAIN + ":81/api/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
-                		memoToUpdate.setImg(img);
+							//저장된 이미지 불러오는 서버 주소
+							String img = "https://" + SERVER_DOMAIN + ":81/api/images/" + nowDate_fd + "/" + nowDate_Img + "_" + userNickname + ".jpg";
+							memoToUpdate.setImg(img);
+						}
             		}
 
 						memoToUpdate.setContent(content);
