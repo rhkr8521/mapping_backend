@@ -55,7 +55,8 @@ public class memoController{
         @RequestParam("content") String content,
         @RequestParam("lat") String lat,
         @RequestParam("lng") String lng,
-        @RequestParam("tag") String tag) throws IOException {
+        @RequestParam("tag") String tag,
+		@RequestParam("ip") String ip) throws IOException {
             
             try{
                 String token = parseBearerToken(request);
@@ -94,6 +95,7 @@ public class memoController{
             item.setLng(lng);
             item.setDate(nowDate_DB);
             item.setTag(tag);
+			item.setIp(ip);
 
             // 만약 이미지파일이 들어오지않았을때 null 처리
             if (file == null || file.isEmpty()){
@@ -200,7 +202,8 @@ public class memoController{
 		@RequestParam("content") String content,
 		@RequestParam("lat") String lat,
 		@RequestParam("lng") String lng,
-		@RequestParam("tag") String tag) throws IOException {
+		@RequestParam("tag") String tag,
+		@RequestParam("ip") String ip) throws IOException {
 	
 		try {
 			String token = parseBearerToken(request);
@@ -254,6 +257,7 @@ public class memoController{
 						memoToUpdate.setLng(lng);
 						memoToUpdate.setDate(nowDate_DB);
 						memoToUpdate.setTag(tag);
+						memoToUpdate.setIp(ip);
 	
 						boardRep.save(memoToUpdate);
 	

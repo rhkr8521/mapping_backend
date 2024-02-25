@@ -20,6 +20,7 @@ public class memo {
     private String img;
     private String date;
     private String tag;
+    private String ip;
     public memo() {
     }
     public memo(String content, String writer, String lat, String lng, String img, String date, String tag) {
@@ -30,5 +31,6 @@ public class memo {
         this.img = img;
         this.date = date;
         this.tag = tag;
+        this.ip = ip;
     }
 }
